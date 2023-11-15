@@ -1,0 +1,52 @@
+dataloader:
+  evaluator: {_target_: detectron2._cfg_loaderd359.builder.py.build_evaluator, max_dets: 50, output_folder: null}
+  test:
+    _target_: detectron2._cfg_loaderd359.builder.py.build_test_loader
+    infer_batch: 1
+    max_dets: 50
+    test_num_workers: 4
+    test_size: [64, 64]
+  train:
+    _target_: detectron2._cfg_loaderd359.builder.py.build_train_loader
+    batch_size: 1
+    data_dir: /data1/jiahaoguo/dataset/gaode_3_coco
+    degrees: 10.0
+    enable_mixup: true
+    image_dir: images
+    input_size: [64, 64]
+    is_distributed: false
+    json_file: train.json
+    no_aug: false
+    num_workers: 1
+    perspective: 0.0
+    scale: [0.1, 2]
+    shear: 2.0
+    translate: 0.1
+lr_cfg: {basic_lr_per_img: 0.00015625, iters_per_epoch: 1769, max_eps: 80, min_lr_ratio: 0.01, no_aug_eps: 10, num_warmup_eps: 1, scheduler_name: yoloxwarmcos, train_batch_size: 16, warmup_lr_start: 0}
+model:
+  _target_: detectron2._cfg_loader1e35.yolo.py.DetectionModel
+  agnostic: false
+  cfg: yolov8l.yaml
+  ch: 3
+  cls_idx: [0]
+  conf: 0.001
+  iou: 0.7
+  multi_label: false
+  nc: 1
+  num_max_dets: 600
+  verbose: true
+optimizer: {_target_: utils.get_optimizer.get_optimizer, basic_lr_per_img: 0.00015625, batch_size: 16, model: null, momentum: 0.937, warmup_epochs: 1, warmup_lr_start: 0, weight_decay: 0.0005}
+train:
+  amp: {enabled: true}
+  checkpointer: {max_to_keep: 5, period: 3538}
+  ddp: {broadcast_buffers: false, find_unused_parameters: false}
+  device: cuda
+  eval_period: 3538
+  init_checkpoint: ''
+  log_period: 20
+  max_iter: 141520
+  model_ema: {after_backward: false, decay: 0.9998, device: cuda, enabled: true, use_ema_weights_for_eval_only: true}
+  output_dir: ./yolov8_l
+  random_size: [20, 36]
+  seed: 0
+  start_iter: 0
