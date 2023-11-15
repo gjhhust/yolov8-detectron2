@@ -19,13 +19,32 @@ You can refer to [complie GMC](https://github.com/hustvl/SparseTrack#compile-gmc
 git clone -b v8 https://github.com/hustvl/SparseTrack.git
 # rename 'SparseTrack' to 'yolov8'
 cd yolov8
+git clone https://github.com/facebookresearch/detectron2.git
+
+conda create --name d2 python=3.8
+conda activate d2
+pip install torch==1.10.1+cu102 torchvision==0.11.2+cu102 torchaudio==0.10.1 -f https://download.pytorch.org/whl/cu102/torch_stable.html
+python -m pip install -e detectron2
+
 pip install -r requirements.txt
 pip install Cython  
 pip install cython_bbox
 ```
 
 ## Data preparation
-Download [MOT17](https://motchallenge.net/), [MOT20](https://motchallenge.net/), [CrowdHuman](https://www.crowdhuman.org/), [Cityperson](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md), [ETHZ](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) and put them under ROOT/ in the following structure:
+### coco format
+```
+ROOT
+   |
+   |——————annotations
+   |        └——————train.json
+   |        └——————test.json
+   └——————images
+   |         └——————*.jpg or .png
+   
+```
+
+### MOT format
 ```
 ROOT
    |
