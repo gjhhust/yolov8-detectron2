@@ -16,7 +16,7 @@ You can refer to [complie GMC](https://github.com/hustvl/SparseTrack#compile-gmc
 
 ## Usage
 ```shell
-git clone -b v8 https://github.com/hustvl/SparseTrack.git
+git clone -b v8 https://github.com/gjhhust/yolov8-d2.git
 # rename 'SparseTrack' to 'yolov8'
 cd yolov8
 git clone https://github.com/facebookresearch/detectron2.git
