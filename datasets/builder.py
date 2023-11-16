@@ -78,7 +78,8 @@ def build_train_loader(
 
     return train_loader
 
-def build_test_loader(data_dir, image_dir, json_file, test_size, infer_batch = 1,  test_num_workers = 4,  max_dets = 1000):
+
+def build_test_loader(test_size, infer_batch = 1,  test_num_workers = 4,  max_dets = 1000):
     """
     Returns:
         iterable
@@ -86,38 +87,41 @@ def build_test_loader(data_dir, image_dir, json_file, test_size, infer_batch = 1
     It now calls :func:`detectron2.data.build_detection_test_loader`.
     Overwrite it if you'd like a different data loader.
     """
-    from datasets.data import GAODECOCODataset,DataLoader
-    from datasets.data import ValTransform
-
-    dataset = GAODECOCODataset(
-        data_dir= data_dir,
-        image_dir=image_dir,
-        json_file=json_file,
-        name='test',
-        img_size= test_size,
-        preproc=ValTransform(
-            rgb_means=(0.485, 0.456, 0.406),
-            std=(0.229, 0.224, 0.225),
-        ),
-    )
-
-    return DataLoader(dataset, num_workers=test_num_workers , batch_size=infer_batch)
-
+    # from datasets.data import GAODECOCODataset
+    # from datasets.data import ValTransform
     # from datasets.mot_mapper import MOTtestMapper
+    # from torch.utils.data.dataloader import DataLoader as torchDataLoader
     
-    
-    # opt.DATALOADER.NUM_WORKERS = test_num_workers
-    # opt.TEST.DETECTIONS_PER_IMAGE = max_dets
-   
-    # print(" building val loader ...")
-    # mapper = MOTtestMapper(
-    #     test_size = test_size,
-    #     preproc = ValTransform(
+    # dataset = GAODECOCODataset(
+    #     data_dir= data_dir,
+    #     image_dir=image_dir,
+    #     json_file=json_file,
+    #     name='test',
+    #     img_size= test_size,
+    #     preproc=ValTransform(
     #         rgb_means=(0.485, 0.456, 0.406),
     #         std=(0.229, 0.224, 0.225),
     #     ),
     # )
-    # return build_detection_test_loader(opt, dataset_name = opt.DATASETS.TEST[0], mapper=mapper, batch_size = infer_batch)
+
+    
+    # return torchDataLoader(dataset,num_workers=test_num_workers , batch_size=infer_batch)
+
+    from datasets.mot_mapper import MOTtestMapper
+    from datasets.data import ValTransform
+    
+    opt.DATALOADER.NUM_WORKERS = test_num_workers
+    opt.TEST.DETECTIONS_PER_IMAGE = max_dets
+   
+    print(" building val loader ...")
+    mapper = MOTtestMapper(
+        test_size = test_size,
+        preproc = ValTransform(
+            rgb_means=(0.485, 0.456, 0.406),
+            std=(0.229, 0.224, 0.225),
+        ),
+    )
+    return build_detection_test_loader(opt, dataset_name = opt.DATASETS.TEST[0], mapper=mapper, batch_size = infer_batch)
 
 def build_evaluator(output_folder=None,  max_dets = 1000):
     """

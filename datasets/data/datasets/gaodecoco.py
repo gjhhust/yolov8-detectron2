@@ -4,7 +4,8 @@ from pycocotools.coco import COCO
 
 import os
 from .datasets_wrapper import Dataset
-
+# import logging
+# logger = logging.getLogger("detectron2")
 
 class GAODECOCODataset(Dataset):
     """
@@ -39,6 +40,7 @@ class GAODECOCODataset(Dataset):
         self.class_ids = sorted(self.coco.getCatIds())
         cats = self.coco.loadCats(self.coco.getCatIds())
         self._classes = tuple([c["name"] for c in cats])
+        # logger.info(f"train dataset class:{self._classes}")
         self.annotations = self._load_coco_annotations()
         self.name = name
         self.img_size = img_size
@@ -129,4 +131,4 @@ class GAODECOCODataset(Dataset):
 
         if self.preproc is not None:
             img, target = self.preproc(img, target, self.input_dim)
-        return img, target, img_info, img_id
+        return img, target, img_info, img_id, self.coco.loadImgs(index)

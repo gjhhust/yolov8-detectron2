@@ -34,7 +34,7 @@ from utils.multiscale import MultiScale
 from utils.lr_scheduler import LRHook
 from utils.mosaic_close import MosaicClose
 from utils import ema
-from register_data import *
+from testDataset import *
 logger = logging.getLogger("detectron2")
 
 def do_test(cfg, model, eval_only=False):

@@ -4,31 +4,36 @@ from utils.get_optimizer import get_optimizer
 from .datasets.builder import build_train_loader, build_test_loader, build_evaluator
 # from .models.model_utils import get_model
 from .models.yolo import DetectionModel
+# 6048
+# bs = 4,  1eps = 1008 iter  
+TOTAL_DATA = 6048 
+
+
+batch_size = 4
+epoch_iters = int(TOTAL_DATA/batch_size)
+
 
 # build dataloader
 dataloader = OmegaConf.create()
 dataloader.train = L(build_train_loader)(
-    batch_size = 1,
-    num_workers = 1,
+    batch_size = batch_size,
+    num_workers = batch_size,
     is_distributed = False,
     no_aug  = False,
-    data_dir = '/data1/jiahaoguo/dataset/gaode_3_coco',
+    data_dir = '/data/jiahaoguo/dataset/gaode_3_coco',
     image_dir = "images",
-    json_file = "debug.json",
+    json_file = "train.json",
     input_size = (640, 640),
-    degrees = 1.0,
+    degrees = 10.0,
     translate = 0.1,
-    scale = (0.1, 0.6),
-    shear = 1.0,
+    scale = (0.1, 1.5),
+    shear = 2.0,
     perspective = 0.0,
     enable_mixup = True,
 )
 dataloader.test = L(build_test_loader)(
-    data_dir = '/data1/jiahaoguo/dataset/gaode_3_coco',
-    image_dir = "images",
-    json_file = "test.json",
     test_size = (640, 640),
-    infer_batch = 1,
+    infer_batch = 4,
     test_num_workers  = 4,
     max_dets = 50
 )
@@ -39,7 +44,7 @@ dataloader.evaluator = L(build_evaluator)(
  
 # build model
 model = L(DetectionModel)(
-    cfg='yolov8s.yaml',  
+    cfg='yolov8l.yaml',  
     ch=3,  
     nc=1,  
     cls_idx = [0,], 
@@ -53,7 +58,7 @@ model = L(DetectionModel)(
  
 # build optimizer
 optimizer = L(get_optimizer)(
-    batch_size = 16, 
+    batch_size = batch_size, 
     basic_lr_per_img = 0.01 / 64.0, 
     model = None, 
     momentum = 0.937, 
@@ -64,10 +69,10 @@ optimizer = L(get_optimizer)(
 
 # build LR
 lr_cfg = dict(
-    train_batch_size = 16, 
+    train_batch_size = batch_size, 
     basic_lr_per_img = 0.01 / 64.0, 
     scheduler_name = "yoloxwarmcos", 
-    iters_per_epoch = 1769, 
+    iters_per_epoch = epoch_iters, 
     max_eps = 80, 
     num_warmup_eps = 1,
     warmup_lr_start = 0,
@@ -75,12 +80,11 @@ lr_cfg = dict(
     min_lr_ratio = 0.01
 )
 
-# bs = 16,  1eps = 1769 iter   
 # build trainer
 train = dict(
-    output_dir="./yolov8_s",
+    output_dir="./yolov8_l",
     init_checkpoint="",
-    max_iter = 1769 * 80 ,
+    max_iter = epoch_iters * 80 ,
     start_iter = 0,
     seed = 0,
     random_size = (20, 36), 
@@ -97,9 +101,9 @@ train = dict(
         device = "cuda",
         after_backward = False
     ),
-    checkpointer=dict(period=1769 * 2, max_to_keep=5),  # options for PeriodicCheckpointer
-    eval_period = 2,
-    log_period = 20,
+    checkpointer=dict(period= epoch_iters * 5, max_to_keep=5),  # options for PeriodicCheckpointer
+    eval_period = epoch_iters * 5,
+    log_period = 50,
     device="cuda"
 )
 
